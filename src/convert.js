@@ -130,10 +130,10 @@ function projectY(y) {
         var sin = Math.sin(y * Math.PI / 180);
         var y2 = 0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI;
         return y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
-    }
-
-    if (projection === 'EPSG:4490') {
+    } else if (projection === 'EPSG:4490') {
         var y2 = 0.25 - (y / 360);
         return y2 < 0 ? 0 : y2 > 0.5 ? 0.5 : y2;
+    } else {
+        throw new Error('Projection  ' + projection + ' is not supported');
     }
 }
