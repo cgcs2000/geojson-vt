@@ -22,8 +22,10 @@ function GeoJSONVT(data, options) {
 
     if (options.maxZoom < 0 || options.maxZoom > 24) throw new Error('maxZoom should be in the 0-24 range');
 
+    if (['EPSG:3857', 'EPSG:4490'].includes(options.projection)) throw new Error('projection only support EPSG:3857 and EPSG:4490');
+
     var z2 = 1 << options.maxZoom, // 2^z
-        features = convert(data, options.tolerance / (z2 * options.extent));
+        features = convert(data, options.tolerance / (z2 * options.extent), options.projection);
 
     this.tiles = {};
     this.tileCoords = [];
@@ -55,7 +57,8 @@ GeoJSONVT.prototype.options = {
     tolerance: 3,           // simplification tolerance (higher means simpler)
     extent: 4096,           // tile extent
     buffer: 64,             // tile buffer on each side
-    debug: 0                // logging level (0, 1 or 2)
+    debug: 0,               // logging level (0, 1 or 2)
+    projection: 'EPSG:3857' // projection of tiles (EPSG:3857 or EPSG:4490)
 };
 
 GeoJSONVT.prototype.splitTile = function (features, z, x, y, cz, cx, cy) {

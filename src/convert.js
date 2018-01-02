@@ -7,8 +7,12 @@ var createFeature = require('./feature');
 
 // converts GeoJSON feature into an intermediate projected JSON vector format with simplification data
 
-function convert(data, tolerance) {
+var projection = 'EPSG:3857'
+
+function convert(data, tolerance, proj) {
     var features = [];
+
+    projection = proj || projection
 
     if (data.type === 'FeatureCollection') {
         for (var i = 0; i < data.features.length; i++) {
@@ -122,7 +126,14 @@ function projectX(x) {
 }
 
 function projectY(y) {
-    var sin = Math.sin(y * Math.PI / 180);
-    var y2 = 0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI;
-    return y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
+    if (projection === 'EPSG:3857') {
+        var sin = Math.sin(y * Math.PI / 180);
+        var y2 = 0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI;
+        return y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
+    }
+
+    if (projection === 'EPSG:4490') {
+        var y2 = 0.25 - (y / 360);
+        return y2 < 0 ? 0 : y2 > 0.5 ? 0.5 : y2;
+    }
 }
