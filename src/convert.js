@@ -14,6 +14,10 @@ function convert(data, tolerance, proj) {
 
     projection = proj || projection
 
+    if (['EPSG:3857', 'EPSG:4490'].indexOf(projection) === -1) {
+        throw new Error('Projection only supports EPSG:3857 or EPSG:4490.');
+    }
+
     if (data.type === 'FeatureCollection') {
         for (var i = 0; i < data.features.length; i++) {
             convertFeature(features, data.features[i], tolerance);
@@ -126,13 +130,13 @@ function projectX(x) {
 }
 
 function projectY(y) {
-    if (projection === 'EPSG:3857') {
+    if (projection === 'EPSG:4490') {
+        var y2 = 0.25 - (y / 360);
+        return y2 < 0 ? 0 : y2 > 0.5 ? 0.5 : y2;
+    } else {
+        // EPSG:3857
         var sin = Math.sin(y * Math.PI / 180);
         var y2 = 0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI;
         return y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
-    } else {
-        // EPSG:4490
-        var y2 = 0.25 - (y / 360);
-        return y2 < 0 ? 0 : y2 > 0.5 ? 0.5 : y2;
     }
 }
