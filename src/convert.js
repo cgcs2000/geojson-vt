@@ -14,8 +14,8 @@ function convert(data, tolerance, proj) {
 
     projection = proj || projection;
 
-    if (['EPSG:3857', 'EPSG:4326'].indexOf(projection) === -1) {
-        throw new Error('Projection only supports EPSG:3857 or EPSG:4326.');
+    if (['EPSG:3857', 'EPSG:4490'].indexOf(projection) === -1) {
+        throw new Error('Projection only supports EPSG:3857 or EPSG:4490.');
     }
 
     if (data.type === 'FeatureCollection') {
@@ -130,7 +130,7 @@ function projectX(x) {
 }
 
 function projectY(y) {
-    if (projection === 'EPSG:4326') {
+    if (projection === 'EPSG:4490') {
         var Y2 = 0.25 - (y / 360);
         return Y2 < 0 ? 0 : Y2 > 0.5 ? 0.5 : Y2;
     } else {
