@@ -1,15 +1,11 @@
-'use strict';
 
-module.exports = geojsonvt;
+import convert from './convert';     // GeoJSON conversion and preprocessing
+import clip from './clip';           // stripe clipping algorithm
+import wrap from './wrap';           // date line processing
+import transform from './transform'; // coordinate transformation
+import createTile from './tile';     // final simplified tile generation
 
-var convert = require('./convert'),     // GeoJSON conversion and preprocessing
-    transform = require('./transform'), // coordinate transformation
-    clip = require('./clip'),           // stripe clipping algorithm
-    wrap = require('./wrap'),           // date line processing
-    createTile = require('./tile');     // final simplified tile generation
-
-
-function geojsonvt(data, options) {
+export default function geojsonvt(data, options) {
     return new GeoJSONVT(data, options);
 }
 
@@ -25,8 +21,7 @@ function GeoJSONVT(data, options) {
     if (!['EPSG:3857', 'EPSG:4490'].includes(options.projection))
         throw new Error('Projection only supports EPSG:3857 or EPSG:4490');
 
-    var z2 = 1 << options.maxZoom, // 2^z
-        features = convert(data, options.tolerance / (z2 * options.extent), options.projection);
+    var features = convert(data, options);
 
     this.tiles = {};
     this.tileCoords = [];
@@ -39,7 +34,7 @@ function GeoJSONVT(data, options) {
         this.total = 0;
     }
 
-    features = wrap(features, options.buffer / options.extent);
+    features = wrap(features, options);
 
     // start slicing from the top tile down
     if (features.length) this.splitTile(features, 0, 0, 0);
@@ -58,6 +53,7 @@ GeoJSONVT.prototype.options = {
     tolerance: 3,           // simplification tolerance (higher means simpler)
     extent: 4096,           // tile extent
     buffer: 64,             // tile buffer on each side
+    lineMetrics: false,     // whether to calculate line metrics
     debug: 0,               // logging level (0, 1 or 2)
     projection: 'EPSG:3857' // projection of tiles (EPSG:3857 or EPSG:4490)
 };
@@ -77,13 +73,12 @@ GeoJSONVT.prototype.splitTile = function (features, z, x, y, cz, cx, cy) {
 
         var z2 = 1 << z,
             id = toID(z, x, y),
-            tile = this.tiles[id],
-            tileTolerance = z === options.maxZoom ? 0 : options.tolerance / (z2 * options.extent);
+            tile = this.tiles[id];
 
         if (!tile) {
             if (debug > 1) console.time('creation');
 
-            tile = this.tiles[id] = createTile(features, z2, x, y, tileTolerance, z === options.maxZoom);
+            tile = this.tiles[id] = createTile(features, z, x, y, options);
             this.tileCoords.push({z: z, x: x, y: y});
 
             if (debug) {
@@ -132,19 +127,19 @@ GeoJSONVT.prototype.splitTile = function (features, z, x, y, cz, cx, cy) {
 
         tl = bl = tr = br = null;
 
-        left  = clip(features, z2, x - k1, x + k3, 0, tile.minX, tile.maxX);
-        right = clip(features, z2, x + k2, x + k4, 0, tile.minX, tile.maxX);
+        left  = clip(features, z2, x - k1, x + k3, 0, tile.minX, tile.maxX, options);
+        right = clip(features, z2, x + k2, x + k4, 0, tile.minX, tile.maxX, options);
         features = null;
 
         if (left) {
-            tl = clip(left, z2, y - k1, y + k3, 1, tile.minY, tile.maxY);
-            bl = clip(left, z2, y + k2, y + k4, 1, tile.minY, tile.maxY);
+            tl = clip(left, z2, y - k1, y + k3, 1, tile.minY, tile.maxY, options);
+            bl = clip(left, z2, y + k2, y + k4, 1, tile.minY, tile.maxY, options);
             left = null;
         }
 
         if (right) {
-            tr = clip(right, z2, y - k1, y + k3, 1, tile.minY, tile.maxY);
-            br = clip(right, z2, y + k2, y + k4, 1, tile.minY, tile.maxY);
+            tr = clip(right, z2, y - k1, y + k3, 1, tile.minY, tile.maxY, options);
+            br = clip(right, z2, y + k2, y + k4, 1, tile.minY, tile.maxY, options);
             right = null;
         }
 
@@ -168,7 +163,7 @@ GeoJSONVT.prototype.getTile = function (z, x, y) {
     x = ((x % z2) + z2) % z2; // wrap tile x coordinate
 
     var id = toID(z, x, y);
-    if (this.tiles[id]) return transform.tile(this.tiles[id], extent);
+    if (this.tiles[id]) return transform(this.tiles[id], extent);
 
     if (debug > 1) console.log('drilling down to z%d-%d-%d', z, x, y);
 
@@ -193,7 +188,7 @@ GeoJSONVT.prototype.getTile = function (z, x, y) {
     this.splitTile(parent.source, z0, x0, y0, z, x, y);
     if (debug > 1) console.timeEnd('drilling down');
 
-    return this.tiles[id] ? transform.tile(this.tiles[id], extent) : null;
+    return this.tiles[id] ? transform(this.tiles[id], extent) : null;
 };
 
 function toID(z, x, y) {
