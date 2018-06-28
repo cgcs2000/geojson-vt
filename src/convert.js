@@ -9,11 +9,7 @@ var projection = 'EPSG:3857';
 export default function convert(data, options) {
     var features = [];
 
-    projection = options.projection || projection;
-
-    if (['EPSG:3857', 'EPSG:4490'].indexOf(projection) === -1) {
-        throw new Error('Projection only supports EPSG:3857 or EPSG:4490.');
-    }
+    projection = options.projection;
 
     if (data.type === 'FeatureCollection') {
         for (var i = 0; i < data.features.length; i++) {
@@ -57,8 +53,8 @@ function convertFeature(features, geojson, options) {
                 geometry = [];
                 convertLine(coords[i], geometry, tolerance, false);
                 features.push(createFeature(geojson.id, 'LineString', geometry, geojson.properties));
-                return;
             }
+            return;
         } else {
             convertLines(coords, geometry, tolerance, false);
         }
@@ -143,10 +139,10 @@ function projectY(y) {
     if (projection === 'EPSG:4490') {
         var Y2 = 0.25 - (y / 360);
         return Y2 < 0 ? 0 : Y2 > 0.5 ? 0.5 : Y2;
-    } else {
-        // EPSG:3857
-        var sin = Math.sin(y * Math.PI / 180);
-        var y2 = 0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI;
-        return y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
     }
+
+    // EPSG:3857
+    var sin = Math.sin(y * Math.PI / 180);
+    var y2 = 0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI;
+    return y2 < 0 ? 0 : y2 > 1 ? 1 : y2;
 }

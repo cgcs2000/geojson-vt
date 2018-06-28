@@ -18,8 +18,11 @@ function GeoJSONVT(data, options) {
 
     if (options.maxZoom < 0 || options.maxZoom > 24) throw new Error('maxZoom should be in the 0-24 range');
 
-    if (!['EPSG:3857', 'EPSG:4490'].includes(options.projection))
+    options.projection = options.projection || 'EPSG:3857';
+
+    if (['EPSG:3857', 'EPSG:4490'].indexOf(options.projection) === -1) {
         throw new Error('Projection only supports EPSG:3857 or EPSG:4490');
+    }
 
     var features = convert(data, options);
 
