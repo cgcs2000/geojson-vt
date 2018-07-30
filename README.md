@@ -57,16 +57,19 @@ var tileIndex = geojsonvt(data, {
 	maxZoom: 14,  // max zoom to preserve detail on; can't be higher than 24
 	tolerance: 3, // simplification tolerance (higher means simpler)
 	extent: 4096, // tile extent (both width and height)
-	buffer: 64,	  // tile buffer on each side
-	debug: 0,      // logging level (0 to disable, 1 or 2)
-	lineMetrics: false,  // whether to enable line metrics tracking for LineString/MultiLineString features
-
+	buffer: 64,   // tile buffer on each side
+	debug: 0,     // logging level (0 to disable, 1 or 2)
+	lineMetrics: false, // whether to enable line metrics tracking for LineString/MultiLineString features
+	promoteId: null,    // name of a feature property to promote to feature.id. Cannot be used with `generateId`
+	generateId: false,  // whether to generate feature ids. Cannot be used with `promoteId`
 	indexMaxZoom: 5,       // max zoom in the initial tile index
 	indexMaxPoints: 100000 // max number of points per tile in the index
 });
 ```
 
 By default, tiles at zoom levels above `indexMaxZoom` are generated on the fly, but you can pre-generate all possible tiles for `data` by setting `indexMaxZoom` and `maxZoom` to the same value, setting `indexMaxPoints` to `0`, and then accessing the resulting tile coordinates from the `tileCoords` property of `tileIndex`.
+
+The `promoteId` and `generateId` options ignore existing `id` values on the feature objects.
 
 GeoJSON-VT only operates on zoom levels up to 24.
 
@@ -85,5 +88,5 @@ const geojsonvt = require('geojson-vt');
 Or use a browser build directly:
 
 ```html
-<script src="https://unpkg.com/geojson-vt@3.1.3/geojson-vt.js"></script>
+<script src="https://unpkg.com/geojson-vt@3.2.0/geojson-vt.js"></script>
 ```
