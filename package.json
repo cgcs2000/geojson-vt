@@ -1,8 +1,8 @@
 {
-  "name": "geojson-vt",
+  "name": "@jingsam/geojson-vt",
   "version": "3.2.1",
   "description": "Slice GeoJSON data into vector tiles efficiently",
-  "homepage": "https://github.com/mapbox/geojson-vt",
+  "homepage": "https://github.com/jingsam/geojson-vt",
   "keywords": [
     "spatial",
     "geojson",
@@ -12,7 +12,7 @@
   "author": "Vladimir Agafonkin",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mapbox/geojson-vt.git"
+    "url": "git://github.com/jingsam/geojson-vt.git"
   },
   "module": "src/index.js",
   "main": "geojson-vt-dev.js",
@@ -46,7 +46,7 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "geojson-vt.js",

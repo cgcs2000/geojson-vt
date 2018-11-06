@@ -1,5 +1,7 @@
 ## geojson-vt &mdash; GeoJSON Vector Tiles
 
+> This repository is a fork of `mapbox/geojson-vt`, but for CGCS200 projection.
+
 [![Build Status](https://travis-ci.org/mapbox/geojson-vt.svg?branch=master)](https://travis-ci.org/mapbox/geojson-vt)
 [![Coverage Status](https://coveralls.io/repos/mapbox/geojson-vt/badge.svg)](https://coveralls.io/r/mapbox/geojson-vt)
 
