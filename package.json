@@ -1,8 +1,8 @@
 {
-  "name": "@jingsam/geojson-vt",
+  "name": "@cgcs2000/geojson-vt",
   "version": "3.2.1",
   "description": "Slice GeoJSON data into vector tiles efficiently",
-  "homepage": "https://github.com/jingsam/geojson-vt",
+  "homepage": "https://github.com/cgcs2000/geojson-vt",
   "keywords": [
     "spatial",
     "geojson",
@@ -12,7 +12,7 @@
   "author": "Vladimir Agafonkin",
   "repository": {
     "type": "git",
-    "url": "git://github.com/jingsam/geojson-vt.git"
+    "url": "git://github.com/cgcs2000/geojson-vt.git"
   },
   "module": "src/index.js",
   "main": "geojson-vt-dev.js",
